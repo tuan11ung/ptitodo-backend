@@ -28,8 +28,6 @@ const createNew =
                 .strict(),
         })
         try {
-            // console.log('req.body:', req.body)
-
             //set abortEarly: false de truong hop co nhieu loi validation thi tra ve tat ca
             await correctCondition.validateAsync(req.body, { abortEarly: false })
             //validate du lieu xong thi gui request di sang controller

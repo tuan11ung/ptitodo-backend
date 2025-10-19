@@ -6,8 +6,6 @@ const createNew = async (req, res, next) => {
         //Dieu huong du lieu sang tang Service
         const createdBoard = await boardService.creatNew(req.body)
 
-        // throw new ApiError(StatusCodes.BAD_GATEWAY, 'co loi nha')
-
         res.status(StatusCodes.CREATED).json(createdBoard)
     } catch (error) {
         next(error)

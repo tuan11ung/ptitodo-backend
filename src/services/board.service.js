@@ -1,4 +1,6 @@
 import { slugify } from "~/utils/formatters"
+import { boardModel } from "~/models/board.model"
+import { boardController } from "~/controllers/board.controller"
 
 /**
  * luon phai tra ve return trong service neu khong req se die
@@ -12,7 +14,15 @@ const creatNew = async (reqBody) => {
             slug: slugify(reqBody.title)
         }
 
-        return newBoard
+        // Goi toi tang Model de xu ly luu ban ghi newBoard vao trong Database
+        const createdBoard = await boardModel.createNew(newBoard)
+        console.log(createdBoard)  
+ 
+        // Lay ban ghi sau khi goi
+        const getNewBoard = await boardModel.findOneById(createdBoard.insertedId)
+        console.log(getNewBoard)
+
+        return getNewBoard
     } catch (error) {
         throw error
     }
