@@ -4,12 +4,17 @@ import 'dotenv/config'
 import { CONNECT_DB, GET_DB, CLOSE_DB } from '~/config/mongodb.js'
 import { APIs_V1 } from '~/routes/v1'
 import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
+import cors from 'cors'
+import { corsOptions } from './config/cors'
 
 const START_SERVER = () => {
   const app = express()
 
   const hostname = 'localhost'
   const port = 8017
+
+  // Xu ly cors
+  app.use(cors(corsOptions))
 
   //enable req.body json data
   app.use(express.json())

@@ -12,7 +12,7 @@ const createNew = async (req, res, next) => {
   }
 }
 
-const getDetails = async (req, res, next) {
+const getDetails = async (req, res, next) => {
   try {
     const boardId = req.params.id
     const board = await boardService.getDetails(boardId)
@@ -24,6 +24,7 @@ const getDetails = async (req, res, next) {
 }
 
 export const boardController = {
-  createNew
+  createNew,
+  getDetails
 }
 
