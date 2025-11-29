@@ -1,6 +1,7 @@
-import Joi from "joi";
-import { StatusCodes } from "http-status-codes";
-import ApiError from "~/utils/ApiError";
+import Joi from 'joi'
+import { StatusCodes } from 'http-status-codes'
+import ApiError from '~/utils/ApiError'
+import { BOARD_TYPES } from '~/utils/constants'
 
 /**
  * Note: Mac dinh khong can phai custom message o phia BE vi de cho FE validate va custom message
@@ -9,34 +10,35 @@ import ApiError from "~/utils/ApiError";
  * trim() phai di kem voi strict()
  */
 
-const createNew = 
-    async (req, res, next) => {
-        const correctCondition = Joi.object({
-            title: Joi
-                .string()
-                .required()
-                .min(3)
-                .max(50)
-                .trim()
-                .strict(),
-            description: Joi
-                .string()
-                .required()
-                .min(3)
-                .max(256)
-                .trim()
-                .strict(),
-        })
-        try {
-            //set abortEarly: false de truong hop co nhieu loi validation thi tra ve tat ca
-            await correctCondition.validateAsync(req.body, { abortEarly: false })
-            //validate du lieu xong thi gui request di sang controller
-            next()
-        } catch (error) {
-            next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
-        }
-    }
+const createNew =
+async (req, res, next) => {
+  const correctCondition = Joi.object({
+    title: Joi
+      .string()
+      .required()
+      .min(3)
+      .max(50)
+      .trim()
+      .strict(),
+    description: Joi
+      .string()
+      .required()
+      .min(3)
+      .max(256)
+      .trim()
+      .strict(),
+    type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required()
+  })
+  try {
+    //set abortEarly: false de truong hop co nhieu loi validation thi tra ve tat ca
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    //validate du lieu xong thi gui request di sang controller
+    next()
+  } catch (error) {
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
+  }
+}
 
 export const boardValidation = {
-    createNew
+  createNew
 }
