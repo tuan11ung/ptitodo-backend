@@ -27,7 +27,7 @@ async (req, res, next) => {
       .max(256)
       .trim()
       .strict(),
-    type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required()
+    type: Joi.string().valid(...Object.values(BOARD_TYPES)).required()
   })
   try {
     //set abortEarly: false de truong hop co nhieu loi validation thi tra ve tat ca
