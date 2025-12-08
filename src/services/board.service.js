@@ -42,6 +42,7 @@ const update = async (boardId, reqBody) => {
     throw error
   }
 }
+
 const getDetails = async (boardId) => {
   try {
     const board = await boardModel.getDetails(boardId)
