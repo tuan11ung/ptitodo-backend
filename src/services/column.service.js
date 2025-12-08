@@ -8,6 +8,8 @@ const createNew = async (reqBody) => {
       ...reqBody
     }
     const createdColumn = await columnModel.createNew(newColumn)
+
+    // Lay ra id cua column moi
     const getNewColumn = await columnModel.findOneById(createdColumn.insertedId)
 
     if (getNewColumn) {
