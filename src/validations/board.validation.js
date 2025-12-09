@@ -49,7 +49,34 @@ const update = async (req, res, next) => {
   }
 }
 
+const moveCardToOtherColumn = async (req, res, next) => {
+  const correctCondition = Joi.object({
+    currentCardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+
+    prevColumnId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    prevCardOrderIds: Joi.array().items(
+      Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+    ),
+
+    nextColumnId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    nextCardOrderIds: Joi.array().items(
+      Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+    )
+  })
+  try {
+    //set abortEarly: false de truong hop co nhieu loi validation thi tra ve tat ca
+    await correctCondition.validateAsync(req.body, {
+      abortEarly: false
+    })
+    //validate du lieu xong thi gui request di sang controller
+    next()
+  } catch (error) {
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
+  }
+}
+
 export const boardValidation = {
   createNew,
-  update
+  update,
+  moveCardToOtherColumn
 }

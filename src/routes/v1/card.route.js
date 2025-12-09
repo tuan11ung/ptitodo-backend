@@ -1,5 +1,5 @@
 import express from 'express'
-import { cardValidation } from '~/validations/cardValidation'
+import { cardValidation } from '~/validations/card.validation'
 import { cardController } from '~/controllers/card.controller'
 
 const Router = express.Router()

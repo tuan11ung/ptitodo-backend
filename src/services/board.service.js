@@ -4,6 +4,9 @@ import { boardModel } from '~/models/board.model'
 import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
+import { columnModel } from '~/models/column.model'
+import { cardModel } from '~/models/card.model'
+import { ObjectId } from 'mongodb'
 
 /**
  * luon phai tra ve return trong service neu khong req se die
@@ -71,9 +74,42 @@ const getDetails = async (boardId) => {
   }
 }
 
+const moveCardToOtherColumn = async (reqBody) => {
+  try {
+  /**
+   * Khi di chuyen card sang column khac
+   * B1: cap nhat lai mang cardOrderIds cua column chua no (xoa _id o mang cu)
+   * B2: cap nhat mang cardOrderIds moi vao column moi
+   * B3: cap nhat lai columnId cua card vua duoc keo
+   * => Lam 1 API support rieng
+   */
+    // console.log("reqBody: ", reqBody);
+    // B1
+    await columnModel.update(reqBody.prevColumnId, {
+      cardOrderIds: reqBody.prevCardOrderIds,
+      updatedAt: Date.now()
+    })
+
+    await columnModel.update(reqBody.nextColumnId, {
+      cardOrderIds: reqBody.nextCardOrderIds,
+      updatedAt: Date.now()
+    })
+
+    await cardModel.update(reqBody.currentId, {
+      columnId: reqBody.nextColumnId,
+      updatedAt: Date.now()
+    })
+
+    return { updateResult: 'Successfully' }
+  } catch (error) {
+    throw error
+  }
+}
+
 
 export const boardService = {
   creatNew,
   update,
-  getDetails
+  getDetails,
+  moveCardToOtherColumn
 }
