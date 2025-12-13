@@ -6,7 +6,6 @@ import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
 import { columnModel } from '~/models/column.model'
 import { cardModel } from '~/models/card.model'
-import { ObjectId } from 'mongodb'
 
 /**
  * luon phai tra ve return trong service neu khong req se die
@@ -95,7 +94,7 @@ const moveCardToOtherColumn = async (reqBody) => {
       updatedAt: Date.now()
     })
 
-    await cardModel.update(reqBody.currentId, {
+    await cardModel.update(reqBody.currentCardId, {
       columnId: reqBody.nextColumnId,
       updatedAt: Date.now()
     })
