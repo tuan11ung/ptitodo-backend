@@ -1,4 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
+import { result } from 'lodash'
 import { userService } from '~/services/user.service'
 
 const createNew = async (req, res, next) => {
@@ -7,6 +8,18 @@ const createNew = async (req, res, next) => {
     const createdUser = await userService.creatNew(req.body)
 
     res.status(StatusCodes.CREATED).json(createdUser)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const login = async (req, res, next) => {
+  try {
+    const result = await userService.login(req.body)
+
+    console.log(result);
+
+    res.status(StatusCodes.CREATED).json(result)
   } catch (error) {
     next(error)
   }
@@ -26,6 +39,7 @@ const getDetails = async (req, res, next) => {
 
 export const userController = {
   createNew,
+  login,
   getDetails
 }
 

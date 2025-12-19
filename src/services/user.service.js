@@ -5,6 +5,8 @@ import { StatusCodes } from 'http-status-codes'
 import { userModel } from '~/models/user.model'
 import bcryptjs from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
+import 'dotenv/config'
+import { JwtProvider } from '~/providers/JwtProvider'
 /**
  * luon phai tra ve return trong service neu khong req se die
  */
@@ -46,6 +48,44 @@ const creatNew = async (reqBody) => {
   }
 }
 
+const login = async (reqBody) => {
+  try {
+    const existedUser = await userModel.findOneByEmail(reqBody.email)
+    if (!existedUser) {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        'Account not found!'
+      )
+    }
+
+    if (!bcryptjs.compareSync(reqBody.password, existedUser.password)) {
+      throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your Email or Password is incorrect!')
+    }
+
+    const userInfo = {
+      _id: existedUser._id,
+      email: existedUser.email
+    }
+
+    const accessToken = await JwtProvider.generateToken(
+      userInfo,
+      process.env.ACCESS_TOKEN_SECRET_SIGNATURE,
+      process.env.ACCESS_TOKEN_LIFE
+    )
+
+    const refreshToken = await JwtProvider.generateToken(
+      userInfo,
+      process.env.REFRESH_TOKEN_SECRET_SIGNATURE,
+      process.env.REFRESH_TOKEN_LIFE
+    )
+
+    return { accessToken, refreshToken, ...pickUser(existedUser) }
+
+  } catch (error) {
+    throw error
+  }
+}
+
 const getDetails = async (userId) => {
   try {
     const user = await userModel.getDetails(userId)
@@ -61,5 +101,6 @@ const getDetails = async (userId) => {
 
 export const userService = {
   creatNew,
+  login,
   getDetails
 }

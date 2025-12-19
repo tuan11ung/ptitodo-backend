@@ -2,8 +2,6 @@ import Joi from 'joi'
 import { EMAIL_RULE, EMAIL_RULE_MESSAGE } from '~/utils/validators.js'
 import { GET_DB } from '~/config/mongodb'
 import { ObjectId } from 'mongodb'
-import { columnModel } from './column.model'
-import { cardModel } from './card.model'
 
 // ROLES
 const USER_ROLE = {
