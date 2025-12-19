@@ -6,12 +6,21 @@ import { APIs_V1 } from '~/routes/v1'
 import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
 import cors from 'cors'
 import { corsOptions } from './config/cors'
+import cookieParser from 'cookie-parser'
 
 const START_SERVER = () => {
   const app = express()
 
   const hostname = 'localhost'
   const port = 8017
+
+  app.use((req, res, next) => {
+    res.get('Cache-control', 'no-store')
+    next()
+  })
+
+  // config cookie parser
+  app.use(cookieParser())
 
   // Xu ly cors
   app.use(cors(corsOptions))
