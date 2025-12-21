@@ -15,7 +15,7 @@ const START_SERVER = () => {
   const port = 8017
 
   app.use((req, res, next) => {
-    res.get('Cache-control', 'no-store')
+    res.set('Cache-Control', 'no-store')
     next()
   })
 

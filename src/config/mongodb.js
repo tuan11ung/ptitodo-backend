@@ -1,8 +1,3 @@
-/**
- * ntuanhung82
- * LvJL9ztKLTiRvtPb
- */
-
 const MONGODB_URI = process.env.MONGODB_URI
 const DATABASE_NAME = process.env.DATABASE_NAME
 

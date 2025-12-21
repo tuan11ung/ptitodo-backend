@@ -71,12 +71,14 @@ const login = async (reqBody) => {
       userInfo,
       process.env.ACCESS_TOKEN_SECRET_SIGNATURE,
       process.env.ACCESS_TOKEN_LIFE
+      // 5
     )
 
     const refreshToken = await JwtProvider.generateToken(
       userInfo,
       process.env.REFRESH_TOKEN_SECRET_SIGNATURE,
       process.env.REFRESH_TOKEN_LIFE
+      // 15
     )
 
     return { accessToken, refreshToken, ...pickUser(existedUser) }
@@ -86,14 +88,39 @@ const login = async (reqBody) => {
   }
 }
 
-const getDetails = async (userId) => {
+// const getDetails = async (userId) => {
+//   try {
+//     const user = await userModel.getDetails(userId)
+//     if (!user) {
+//       throw new ApiError(StatusCodes.NOT_FOUND, 'User not found!')
+//     }
+
+//     return user
+//   } catch (error) {
+//     throw error
+//   }
+// }
+
+const refreshToken = async (clientRefreshToken) => {
   try {
-    const user = await userModel.getDetails(userId)
-    if (!user) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found!')
+    const refreshTokenDecoded = await JwtProvider.verifyToken(
+      clientRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET_SIGNATURE
+    )
+
+    const userInfo = {
+      _id: refreshTokenDecoded._id,
+      email: refreshTokenDecoded.email
     }
 
-    return user
+    const accessToken = await JwtProvider.generateToken(
+      userInfo,
+      process.env.ACCESS_TOKEN_SECRET_SIGNATURE,
+      process.env.ACCESS_TOKEN_LIFE
+      // 5
+    )
+
+    return { accessToken }
   } catch (error) {
     throw error
   }
@@ -102,5 +129,6 @@ const getDetails = async (userId) => {
 export const userService = {
   creatNew,
   login,
-  getDetails
+  refreshToken
+  // getDetails
 }

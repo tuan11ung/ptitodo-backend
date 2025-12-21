@@ -68,27 +68,27 @@ const findOneByEmail = async (emailValue) => {
 }
 
 
-const getDetails = async (id) => {
-  try {
-    const result = await GET_DB().collection(USER_COLLECTION_NAME).aggregate([
-      {
-        $match: {
-          _id: new ObjectId(id),
-          _destroy: false
-        }
-      },
-      {
-        $project: {
-          password: 0,
-          verifyToken: 0
-        }
-      }
-    ]).toArray()
-    return result[0] || null
-  } catch (error) {
-    throw new Error(error)
-  }
-}
+// const getDetails = async (id) => {
+//   try {
+//     const result = await GET_DB().collection(USER_COLLECTION_NAME).aggregate([
+//       {
+//         $match: {
+//           _id: new ObjectId(id),
+//           _destroy: false
+//         }
+//       },
+//       {
+//         $project: {
+//           password: 0,
+//           verifyToken: 0
+//         }
+//       }
+//     ]).toArray()
+//     return result[0] || null
+//   } catch (error) {
+//     throw new Error(error)
+//   }
+// }
 
 const update = async (userId, updateData) => {
   try {
@@ -115,6 +115,6 @@ export const userModel = {
   createNew,
   update,
   findOneById,
-  findOneByEmail,
-  getDetails
+  findOneByEmail
+  // getDetails
 }
