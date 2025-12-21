@@ -6,6 +6,7 @@ import { BOARD_TYPES } from '~/utils/constants'
 import { columnModel } from './column.model'
 import { cardModel } from './card.model'
 import { pagingSkipValue } from '~/utils/algorithms'
+import { userModel } from './user.model'
 
 // Define Collection (name & schema)
 const BOARD_COLLECTION_NAME = 'boards'
@@ -90,6 +91,22 @@ const getDetails = async (userId, boardId) => {
         localField: '_id',
         foreignField: 'boardId',
         as: 'cards'
+      } },
+      { $lookup: {
+        from: userModel.USER_COLLECTION_NAME,
+        localField: 'ownerIds',
+        foreignField: '_id',
+        as: 'owners',
+        // Pipeline de xu ly 1 hoac nhieu luong
+        // Project de chi dinh fields ko muon lay ve
+        pipeline: [{ $project: { 'password': 0, 'verifyToken': 0 } }]
+      } },
+      { $lookup: {
+        from: userModel.USER_COLLECTION_NAME,
+        localField: 'memberIds',
+        foreignField: '_id',
+        as: 'members',
+        pipeline: [{ $project: { 'password': 0, 'verifyToken': 0 } }]
       } }
     ]).toArray()
     return result[0] || null
