@@ -1,4 +1,5 @@
 /* eslint-disable no-useless-catch */
+import { date } from 'joi'
 import { cardModel } from '~/models/card.model'
 import { columnModel } from '~/models/column.model'
 import { CloudinaryProvider } from '~/providers/CloudinaryProvider'
@@ -24,7 +25,7 @@ const createNew = async (reqBody) => {
   }
 }
 
-const update = async (cardId, reqBody, cardCoverFile) => {
+const update = async (cardId, reqBody, cardCoverFile, userInfo) => {
   try {
     const updatedData = {
       ...reqBody,
@@ -41,12 +42,22 @@ const update = async (cardId, reqBody, cardCoverFile) => {
       updatedCard = await cardModel.update(cardId, {
         cover: uploadResult.secure_url
       })
-    } else {
+    }
+    else if (updatedData.commentToAdd) {
+      // Tao du lieu comment de them vao db
+      const commentData = {
+        ...updatedData.commentToAdd,
+        commentedAt: Date.now(),
+        userId: userInfo._id,
+        userEmail: userInfo.email
+      }
+      updatedCard = await cardModel.unshiftNewComment(cardId, commentData)
+    }
+    else {
       // TH update thong tin chung
       updatedCard = await cardModel.update(cardId, updatedData)
     }
-
-
+    
     return updatedCard
   } catch (error) {
     throw error
