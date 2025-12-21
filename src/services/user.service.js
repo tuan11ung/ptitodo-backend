@@ -126,9 +126,37 @@ const refreshToken = async (clientRefreshToken) => {
   }
 }
 
+const update = async (userId, reqBody) => {
+  try {
+    const existedUser = await userModel.findOneById(userId)
+    if (!existedUser) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found!')
+    let updatedUser = {
+    }
+
+    if (reqBody.current_password && reqBody.new_password) {
+      // TH Update password
+      if (!bcryptjs.compareSync(reqBody.current_password, existedUser.password)) {
+        throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your Current Password is incorrect!')
+      }
+      // Neu current pass dung thi hash new password va day vao db
+      updatedUser = await userModel.update(userId, {
+        password: bcryptjs.hashSync(reqBody.new_password, 8)
+      })
+    }
+    else { // TH Update nhung thong tin chung nhu displayName
+      updatedUser = await userModel.update(userId, reqBody)
+    }
+
+    return pickUser(updatedUser)
+  } catch (error) {
+    throw error
+  }
+}
+
 export const userService = {
   creatNew,
   login,
-  refreshToken
+  refreshToken,
+  update
   // getDetails
 }
