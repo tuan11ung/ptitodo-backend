@@ -7,6 +7,7 @@ import bcryptjs from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 import 'dotenv/config'
 import { JwtProvider } from '~/providers/JwtProvider'
+import { CloudinaryProvider } from '~/providers/CloudinaryProvider'
 /**
  * luon phai tra ve return trong service neu khong req se die
  */
@@ -126,7 +127,7 @@ const refreshToken = async (clientRefreshToken) => {
   }
 }
 
-const update = async (userId, reqBody) => {
+const update = async (userId, reqBody, userAvatarFile) => {
   try {
     const existedUser = await userModel.findOneById(userId)
     if (!existedUser) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found!')
@@ -141,6 +142,15 @@ const update = async (userId, reqBody) => {
       // Neu current pass dung thi hash new password va day vao db
       updatedUser = await userModel.update(userId, {
         password: bcryptjs.hashSync(reqBody.new_password, 8)
+      })
+    }
+    else if (userAvatarFile) {
+      // TH cap nhat avatar
+      const uploadResult = await CloudinaryProvider.streamUpload(userAvatarFile.buffer, 'users')
+
+      // Luu lai URL cua file anh vao db
+      updatedUser = await userModel.update(existedUser._id, {
+        avatar: uploadResult.secure_url
       })
     }
     else { // TH Update nhung thong tin chung nhu displayName
