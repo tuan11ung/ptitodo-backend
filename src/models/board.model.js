@@ -179,7 +179,6 @@ const getBoards = async (userId, page, itemsPerPage) => {
       // De sort theo thu tu A-Z
       { collation: { locale: 'en' } }
     ).toArray()
-    console.log('🚀 ~ getBoards ~ query:', query)
     const res = query[0]
 
     return {
