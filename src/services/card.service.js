@@ -1,5 +1,4 @@
 /* eslint-disable no-useless-catch */
-import { date } from 'joi'
 import { cardModel } from '~/models/card.model'
 import { columnModel } from '~/models/column.model'
 import { CloudinaryProvider } from '~/providers/CloudinaryProvider'
@@ -57,7 +56,7 @@ const update = async (cardId, reqBody, cardCoverFile, userInfo) => {
       // TH update thong tin chung
       updatedCard = await cardModel.update(cardId, updatedData)
     }
-    
+
     return updatedCard
   } catch (error) {
     throw error

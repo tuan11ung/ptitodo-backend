@@ -4,7 +4,7 @@ import { GET_DB } from '~/config/mongodb'
 import { ObjectId } from 'mongodb'
 
 // ROLES
-const USER_ROLE = {
+const USER_ROLES = {
   CLIENT: 'client',
   ADMIN: 'admin'
 }
@@ -18,7 +18,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   username: Joi.string().required().min(2).strict().trim(),
   displayName: Joi.string().required().min(2).strict().trim(),
   avatar: Joi.string().default(null),
-  role: Joi.string().valid(USER_ROLE.CLIENT, USER_ROLE.ADMIN).default(USER_ROLE.CLIENT),
+  role: Joi.string().valid(...Object.values(USER_ROLES)).default(USER_ROLES.CLIENT),
 
   isActive: Joi.boolean().default(false),
   verifyToken: Joi.string(),
