@@ -7,6 +7,9 @@ import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
 import cors from 'cors'
 import { corsOptions } from './config/cors'
 import cookieParser from 'cookie-parser'
+import { createServer } from 'node:http'
+import { Server } from 'socket.io'
+import { inviteUserToBoardSocket } from './sockets/inviteUserToBoardSocket'
 
 const START_SERVER = () => {
   const app = express()
@@ -34,7 +37,15 @@ const START_SERVER = () => {
   //middleware xu ly loi tap trung
   app.use(errorHandlingMiddleware)
 
-  app.listen(port, hostname, () => {
+  // Tao 1 server lam real time voi socket io
+  const server = createServer(app)
+  const io = new Server(server, { cors: corsOptions })
+
+  io.on('connection', (socket) => {
+    inviteUserToBoardSocket(socket)
+  })
+
+  server.listen(port, hostname, () => {
     // eslint-disable-next-line no-console
     console.log(`3. Backend server is running successfully at http://${hostname}:${port}/`)
   })

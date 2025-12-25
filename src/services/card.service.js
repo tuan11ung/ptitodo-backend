@@ -11,7 +11,6 @@ const createNew = async (reqBody) => {
     const createdCard = await cardModel.createNew(newcard)
     const getNewCard = await cardModel.findOneById(createdCard.insertedId)
 
-    //...
     if (getNewCard) {
 
       // Cap nhat mang columnOrderIds trong collection boards

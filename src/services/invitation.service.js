@@ -9,13 +9,13 @@ import { pickUser } from '~/utils/formatters'
 
 const createNewBoardInvitation = async (reqBody, inviterId) => {
   try {
-    // Nguoi moi
+    // Người mời
     const inviter = await userModel.findOneById(inviterId)
 
-    // Nguoi duoc moi
+    // Người được mời
     const invitee = await userModel.findOneByEmail(reqBody.inviteeEmail)
 
-    // Board dang xu ly
+    // Board hiện tại
     const board = await boardModel.findOneById(reqBody.boardId)
 
     if (!inviter || !invitee || !board) {
@@ -51,14 +51,17 @@ const createNewBoardInvitation = async (reqBody, inviterId) => {
 const getInvitations = async (userId) => {
   try {
     const getInvitations = await invitationModel.findByUser(userId)
+
+    // Vi cac du lieu inviter, invitee, board la mang 1 phan tu nen bien doi ve json object
     const resInvitation = getInvitations.map(i => {
       return {
         ...i,
         inviter: i.inviter[0] || {},
-        invitee: i.invitee[0] || {}
+        invitee: i.invitee[0] || {},
+        board: i.board[0] || {}
       }
     })
-    console.log('🚀 ~ getInvitations ~ resInvitation:', resInvitation)
+    // console.log('🚀 ~ getInvitations ~ resInvitation:', resInvitation)
 
     return resInvitation
   } catch (error) {
@@ -66,7 +69,46 @@ const getInvitations = async (userId) => {
   }
 }
 
+const updateBoardInvitation = async (userId, invitationId, status) => {
+  try {
+    const getInvitation = await invitationModel.findOneById(invitationId)
+    if (!getInvitation) throw new ApiError(StatusCodes.NOT_FOUND, 'Invitation not found!')
+
+    const boardId = getInvitation.boardInvitation.boardId
+    const getBoard = await boardModel.findOneById(boardId)
+
+    if (!getBoard) throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found!')
+
+    const userInBoard = [...getBoard.ownerIds, ...getBoard.memberIds].toString()
+    if (status === BOARD_INVITATION_STATUS.ACCEPTED && userInBoard.includes(userId)) {
+      throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'User already in this board!')
+    }
+
+    // Tao du lieu update
+    const updateData = {
+      boardInvitation: {
+        ...getInvitation.boardInvitation,
+        status: status
+      }
+    }
+
+    // B1: Cap nhat status trong ban ghi invitation
+    const updatedInvitation = await invitationModel.update(invitationId, updateData)
+
+    // B2: Neu ACCEPTED thi phai them thong tin user vao mang memberIds cua board
+    if (updatedInvitation.boardInvitation.status === BOARD_INVITATION_STATUS.ACCEPTED) {
+      await boardModel.pushMemberIds(boardId, userId)
+    }
+
+    return updatedInvitation
+
+  } catch (error) {
+    throw error
+  }
+}
+
 export const invitationService = {
   createNewBoardInvitation,
-  getInvitations
+  getInvitations,
+  updateBoardInvitation
 }
